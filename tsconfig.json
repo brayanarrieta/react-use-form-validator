@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "moduleResolution": "node",
+      "strict": true,
+      "esModuleInterop": true,
+      "jsx": "react",
+      "types": ["jest"],
+      "outDir": "dist",
+      "lib": ["es2016"],
+      "sourceMap": true
+    },
+    
+    "include": ["src"],
+    "exclude": ["node_modules", "**/*.test.*", "dist"]
+  }
