@@ -1,3 +1,5 @@
+type FieldRequiredProperty = string | boolean | undefined;
+
 type FieldDescriptor = {
     value: any,
     required?: FieldRequiredProperty;
@@ -5,39 +7,37 @@ type FieldDescriptor = {
     validator?: any;
 }
 
-type FieldRequiredProperty = string | boolean | undefined;
-
 export class FormFieldModel {
   constructor(fieldDescriptor: FieldDescriptor) {
     const {
       value, required, fieldName, validator,
     } = fieldDescriptor;
 
-    this._value = value;
-    this._required = required;
-    this._fieldName = fieldName;
-    this._validatorFunction = validator;
-    this._interacted = false;
+    this.#value = value;
+    this.#required = required;
+    this.#fieldName = fieldName;
+    this.#validatorFunction = validator;
+    this.#interacted = false;
   }
 
-    _value: any;
+    #value: any;
 
-    _required: FieldRequiredProperty;
+    #required: FieldRequiredProperty;
 
-    _fieldName: string;
+    #fieldName: string;
 
-    _validatorFunction: any;
+    #validatorFunction: any;
 
-    _interacted: boolean;
+    #interacted: boolean;
 
-    _errorMessage: string | undefined;
+    #errorMessage: string | undefined;
 
     get value() {
-      return this._value;
+      return this.#value;
     }
 
     get required() {
-      return this._required;
+      return this.#required;
     }
 
     get hasValue() {
@@ -45,21 +45,23 @@ export class FormFieldModel {
     }
 
     get fieldName() {
-      return this._fieldName;
+      return this.#fieldName;
     }
 
-    setErrorMessage = (newErrorMessage: string | undefined) => this._errorMessage = newErrorMessage;
+    set errorMessage(newErrorMessage: string | undefined) {
+      this.#errorMessage = newErrorMessage;
+    }
 
     setValue = (newValue: any) => {
-      if (!this._interacted) {
-        this._interacted = true;
+      if (!this.#interacted) {
+        this.#interacted = true;
       }
 
-      if (this._value === newValue) {
+      if (this.value === newValue) {
         return;
       }
 
-      this._value = newValue;
+      this.#value = newValue;
     }
 
     validate = () => {
@@ -69,8 +71,12 @@ export class FormFieldModel {
 
       if (shouldSkipValidation) return;
       if (required) {
-        const message = !this.hasValue ? typeof this._required === 'string' ? this._required : `Field: "${this.fieldName}" is required` : undefined;
-        this.setErrorMessage(message);
+        if (this.hasValue) {
+          this.errorMessage = undefined;
+          return;
+        }
+        const message = typeof this.#required === 'string' ? this.#required : `Field: "${this.fieldName}" is required`;
+        this.errorMessage = message;
       }
     }
 }

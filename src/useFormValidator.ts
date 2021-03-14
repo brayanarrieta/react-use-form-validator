@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormFieldModel } from './FormFieldModel';
-import { useConstructor } from './useConstructor';
 
 // const exampleState = {
 //     fieldName: {
@@ -13,14 +12,10 @@ import { useConstructor } from './useConstructor';
 //     fieldName: {value, onFieldChange, error}
 // }
 const useFormValidator = (descriptors: any = {}) => {
-  const [fields, setFields] = React.useState(() => _getFieldsStructure());
+  const getFieldsKeys = (): string[] => Object.keys(descriptors);
 
-  React.useEffect(() => {
-    _addFields();
-  }, [descriptors]);
-
-  const _getFieldsStructure = () => {
-    const fieldsKeys = _getFieldsKeys();
+  const getFieldsStructure = () => {
+    const fieldsKeys = getFieldsKeys();
     const fieldsStructure = fieldsKeys.reduce((acc: any, key) => {
       acc[key] = new FormFieldModel(descriptors[key]);
       return acc;
@@ -28,15 +23,19 @@ const useFormValidator = (descriptors: any = {}) => {
     return fieldsStructure;
   };
 
-  const _addFields = () => {
-    const fieldsStructure = _getFieldsStructure();
+  const [fields, setFields] = React.useState(() => getFieldsStructure());
+
+  const addFields = () => {
+    const fieldsStructure = getFieldsStructure();
     setFields(fieldsStructure);
   };
 
-  const _getFieldsKeys = (): string[] => Object.keys(descriptors);
+  React.useEffect(() => {
+    addFields();
+  }, [descriptors]);
 
   const validate = () => {
-    const fieldsKeys = _getFieldsKeys();
+    const fieldsKeys = getFieldsKeys();
     return Promise.all(
       fieldsKeys.map((key) => Promise.resolve(fields[key].validate())),
     );
